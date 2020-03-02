@@ -1,0 +1,42 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+#判断ax^2+bx+c=0是否有解的简单程序
+#求解函数
+#Fraction(分子，分母);
+import math
+arr=[0 for i in range(5)]
+sum=0
+def solvex(a1,b1):
+    if sum==0:
+        res=-b1/2*a1
+        arr[0]=res
+    else:
+        res=(-b1+math.sqrt(sum))/(2*a1)
+        arr[0]=res
+        res=(-b1-math.sqrt(sum))/(2*a1)
+        arr[1]=res
+    return 0
+a=int(input("请输入a:"))
+b=int(input("请输入b:"))
+c=int(input("请输入c:"))
+sum=b*b - 4*a*c
+if sum >= 0:
+    solvex(a,b)
+    i=0
+    if sum==0:
+        print("该方程有一个解，x=",end="")
+        for i in range(1):
+            print(arr[i])
+    else:
+        print("该方程有两个解，x=",end="")
+        for i in range(0,2):
+            print(arr[i],end="")
+            if i==0:
+                print("、",end="")
+else:
+    print("该方程无解！\n")
+
