@@ -1,0 +1,23 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import tensorflow as tf
+bohs=tf.keras.datasets.boston_housing
+(x,y),(_,_)=bohs.load_data(test_split=0)#全部划分到测试数组
+#x中时与房价有关的属性，y是房价
+print(len(x),"\n")
+print(len(y))
+
+plt.rcParams['font.sans-serif']=['SimHei']
+plt.rcParams['axes.unicode_minus']=False
+adri=["CRIM","ZN","INDUS","CHAS","NOX","RM","AGE","DIS","RAD","TAX","PTRATIO","B-100","LATAT","MEDV"]
+tadri=["1.CRIM","2.ZN","3.INDUS","4.CHAS","5.NOX","6.RM","7.AGE","8.DIS","9.RAD","10.TAX","11.PTRATIO","12.B-100","13.LATAT"]
+for i in range(0,13):
+    print(i+1," ",adri[i],"\n")
+res=int(input("请输入属性值："))
+
+plt.figure(figsize=(12,12))
+plt.scatter(x[:,res-1],y,marker='o',color="blue")
+plt.xlabel(adri[res-1])
+plt.ylabel("Price($1000's)")
+plt.title(tadri[res-1]+"-Price")
+plt.show()
