@@ -1,0 +1,42 @@
+import matplotlib.pyplot as plt
+from PIL import Image
+img=Image.open("E:\pictures\lena.tiff")
+
+plt.rcParams['font.sans-serif']=['SimHei']
+plt.rcParams['axes.unicode_minus']=False
+
+#分隔rgb通道
+img_r,img_g,img_b=img.split()
+fig=plt.figure(figsize=(5,5))
+
+plt.subplot(221)
+plt.axis("off")
+img_s=img_r.resize((50,50))
+plt.imshow(img_r,"gray")
+plt.title("R-缩放", fontsize=14)
+
+
+plt.subplot(222)
+img_gl=img_g.transpose(Image.FLIP_LEFT_RIGHT)
+img_gll=img_gl.transpose(Image.ROTATE_270)
+plt.imshow(img_gll,"gray")
+plt.title("G-镜像+旋转", fontsize=14)
+
+plt.subplot(223)
+plt.axis("off")
+img_bl=img_b.crop((0,0,150,150))
+plt.imshow(img_bl,"gray")
+plt.title("B-剪裁", fontsize=14)
+
+plt.subplot(224)
+plt.axis("off")
+img_a=Image.merge("RGB",[img_r,img_g,img_b])
+plt.imshow(img_a)
+plt.title("RGB", fontsize=14)
+img_a.save("E:\pictures\lena.png")
+
+fig.suptitle("图像基本操作",fontsize=20,color="blue")
+fig.tight_layout()
+plt.subplots_adjust(wspace =0.1, hspace =0.3,top=0.85)
+
+plt.show()
