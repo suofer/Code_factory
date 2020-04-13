@@ -1,0 +1,79 @@
+import  tensorflow.compat.v1 as tf
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.utils import shuffle#洗牌，打乱顺序
+
+#读取数据文件
+df =pd.read_csv("D:/netSecurity/data/boston.csv",header=0)
+#显示数据摘要信息
+#print(df.describe())
+df = np.array(df)
+
+
+
+#进行数据归一化，使得数据被映射到[0,1]之间
+for i in range(12):
+    df[:,i]=df[:,i]/(df[:,i].max()-df[:,i].min())
+#print(df)
+x_data=df[:,:12]
+y_data=df[:,12]#最后一列为y_data其余列是x_data
+#定义模型，为后面的模型训练做准备
+#1、特征数据和标签数据的占位符
+tf.disable_eager_execution()
+x=tf.placeholder(tf.float32,[None,12],name="X")
+y=tf.placeholder(tf.float32,[None,1],name="Y")
+#None 表示 有多少行还不确定，但是列只有12列和1列
+#定义模型函数
+#1.定义一个命名空间
+with tf.name_scope("Model"):
+    #w初始化值为shape=(12,1)的随机数
+    w = tf.Variable(tf.random_normal([12,1],stddev=0.01),name="W")
+    #b初始化的值是1.0
+    b = tf.Variable(1.0)
+    #w和x是矩阵相乘，用函数matmul，不能用multiply或者*
+    def model(x,w,b):
+        return tf.matmul(x,w) + b
+#训练模型
+train_epochs=50
+learning_rate=0.025#学习率
+pre=model(x,w,b)
+with tf.name_scope("LoseFunction"):
+    loss_function=tf.reduce_mean(tf.pow(y-pre,2))
+optimizer=tf.train.GradientDescentOptimizer(learning_rate).minimize(loss_function)    
+sess=tf.Session();
+init=tf.initialize_all_variables()
+sess.run(init)
+lose_list=[]
+#设置日志存储目录
+logdir='D:/test/neural_network'
+#创建一个操作，用于记录损失值loss并且进行可视化
+sum_loss_op=tf.summary.scalar("loss",loss_function)
+#把所有的需要记录的文件摘要日志合并，方便一次性写入，本来这里只有一个日志其实不用
+merged=tf.summary.merge_all()
+
+#创建摘要的文件写入器
+writer=tf.summary.FileWriter(logdir,sess.graph)
+
+
+for epoch in range(train_epochs):
+    lose_sum=0
+    for xs,ys in zip(x_data,y_data):
+        xs=xs.reshape(1,12)
+        ys=ys.reshape(1,1)
+       # _,summary_str,lose=sess.run([optimizer,sum_loss_op,loss_function],feed_dict={x:xs,y:ys})
+        _,lose=sess.run([optimizer,loss_function],feed_dict={x:xs,y:ys})
+        #写入文件
+       # writer.add_summary(summary_str,epoch)
+        #显示损失值
+        lose_sum =lose_sum + lose
+       # lose_list.append(lose)
+    x.values,y_values=shuffle(x_data, y_data)#进行洗牌操作
+    bOtemp=b.eval(session=sess)
+    wOtemp=w.eval(session=sess)
+    loss_average=lose_sum/len(y_data)#因为这里是12元的一个关系，所以求得是平均损失
+    print("Train Eporch=",epoch+1,' loss=',loss_average," b=",bOtemp," w=", wOtemp)#输出每轮训练之后的结果
+    lose_list.append(loss_average)
+
+sess.close()
+plt.plot(lose_list)#画出loss值得变化轨迹
